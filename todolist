@@ -1,0 +1,207 @@
+
+import mysql.connector as mysql
+DB_NAME = "todolist"
+
+def createDatabase():
+    try:
+        mycursor.execute("SHOW DATABASES")
+        DB_list = mycursor.fetchall()
+        if (DB_NAME,) in DB_list:
+            print("Database exists :)")
+        else:
+            mycursor.execute("CREATE DATABASE {}".format(DB_NAME))
+            print("Database {} created successfully".format(DB_NAME))
+    except Exception as e:
+        print("An error occurred:", e)
+
+    
+def createTable(Table_name):
+    try:
+        mycursor.execute("USE {}".format(DB_NAME))
+        mycursor.execute("SHOW TABLES")
+        Table_list = mycursor.fetchall()
+        if (Table_name,) in Table_list:    
+            print("User already exist!!!")
+        else:
+            mycursor.execute("CREATE TABLE {} (day VARCHAR(255), Task1 VARCHAR(255), Task2 VARCHAR(255), Task3 VARCHAR(255), Task4 VARCHAR(255), Task5 VARCHAR(255))".format(Table_name))
+    except mysql.connector.Error as error:
+        print("Error creating table: {}".format(error))
+
+
+
+def insertValue(day, task1, task2, task3, task4, task5):
+    mycursor.execute("INSERT INTO {} (day, task1, task2, task3, task4, task5) VALUES (%s, %s, %s, %s, %s, %s) ".format(table), (day, task1, task2, task3, task4, task5))
+    conn.commit()
+
+    
+    
+def showAllValue():
+    mycursor.execute("SELECT * FROM {}".format(table))
+    #data = mycursor.fetchall()
+    for data in mycursor: 
+        print(data)
+
+def showValue(day):
+    try:
+        mycursor.execute("SELECT task1, task2, task3, task4, task5 FROM {} WHERE day = '{}'".format(table,day))
+        for data in mycursor: 
+            print(data)
+    except:
+        print("error occured while fetching result")
+        
+              
+          
+ #   main program
+
+try:
+    conn = mysql.connect(
+        host="localhost",
+        user="root",
+        password="xyz",
+    )  
+    mycursor = conn.cursor()
+    createDatabase()
+    
+    #create menu
+    for i in range(30):
+        print("-", end="^")
+    print()
+    
+    print("Welcome to TODOLIST")
+    print("Choose your option(1/2/3)")
+    print("1. New User?")
+    print("2. already a user?")
+    print("3. Exit")
+    
+    
+    #take choice from user
+    while(True):
+        try:
+            
+            choice = int(input("Enter your choice ,new user(1)/already a user?(2)/Exit(3): "))
+            for i in range(30):
+                print("-", end="^")
+            print()
+            # action done as per choice
+            if choice== 1:
+                mycursor.execute("USE {}".format(DB_NAME))
+                mycursor.execute("SHOW TABLES")
+                Table_list = mycursor.fetchall()
+                table = input("Enter your name please: ")        
+                if (table,) in Table_list:    
+                    print("User already exist!!!")
+                    pass
+                else:   
+                   createTable("{}".format(table))
+                   print("Hello","{}".format(table),"Insert data to your todo list")
+                   while(True):
+                       for i in range(30):
+                           print("*", end=" ")
+                       print()
+                       day = input("Enter the day to be scheduled: ")
+                       if day in ["monday","tuesday","wednesday","thursday","friday","saturday"]:
+                           task1 = input("Enter the task1 of the day: ")
+                           task2 = input("Enter the task2 of the day: ")
+                           task3 = input("Enter the task3 of the day: ")
+                           task4 = input("Enter the task4 of the day: ")
+                           task5 = input("Enter the task5 of the day: ")
+                           break
+                       else:
+                           print("please enter valid day")
+                           pass
+                   insertValue(day, task1, task2, task3, task4, task5 )
+                   for i in range(30):
+                       print("*", end=" ")
+                   print()
+                   
+            elif choice== 2:
+                   while(True):
+                       for i in range(30):
+                           print("~", end=" ")
+                       print()
+                       table = input("Enter your name please: ")
+                       mycursor.execute("USE {}".format(DB_NAME))
+                       mycursor.execute("SHOW TABLES")
+                       Table_list = [table_tuple[0] for table_tuple in mycursor.fetchall()]
+                       if (table) in Table_list:
+                           for i in range(30):
+                               print("~", end=" ")
+                           print()
+                           print("Hello {} welcome to your to do list".format(table))
+                           print("Choose your option (1/2/3/4)")
+                           print("1. View all schedules you have set for the week")
+                           print("2. View schedules of the perticular day")
+                           print("3. Insert data to your todo list")
+                           print("4. Exit")
+                           while(True):
+                               choice = int(input("Enter your choice- 1/2/3/4: "))
+                               
+                               if choice== 1:
+                                   showAllValue()
+                                      
+                               elif choice ==2 :
+                                   day = input("Enter the day whose schedule to be displayed: ")
+                                   if day in ["monday","tuesday","wednesday","thursday","friday","saturday"]:
+                                       showValue(day)
+                                   
+                                   else:
+                                       print("Enter a valid day....")
+                                   pass
+                                   
+                                     
+                               elif choice == 3:
+                               
+                                   while True:
+                                       day = input("Enter the day to be scheduled: ")
+                                       if day in ["monday","tuesday","wednesday","thursday","friday","saturday"]:
+                                           task1 = input("Enter the task1 of the day: ")
+                                           task2 = input("Enter the task2 of the day: ")
+                                           task3 = input("Enter the task3 of the day: ")
+                                           task4 = input("Enter the task4 of the day: ")
+                                           task5 = input("Enter the task5 of the day: ")
+                                           break
+                                       else:
+                                           print("please enter valid day")
+                                           pass
+                                       
+                                   insertValue(day, task1, task2, task3, task4, task5)
+                               elif choice == 4:
+                                   print("THANK YOU :)")
+                                   break
+                               else:
+                                   print("Not a valid choice!")
+                                   print("choose again!")
+                               for i in range(40):
+                                   print("~", end=" ")
+                               print()
+                                    
+                               pass
+                           
+                       else :
+                           print("Please enter a valid username")
+                       for i in range(30):
+                           print("*", end=" ")
+                       print()
+                       break
+                   
+            elif choice == 3:
+                break
+            else:
+                print("Enter valid choice :) ")
+            #################################################################
+        except  ValueError:
+            print("Enter a valid choice!")
+            pass
+        for i in range(30):
+            print("*", end=" ")
+        print()   
+    conn.close()
+
+
+    #############################################################
+
+except:
+    print("Error connecting to MySQL.")
+finally:
+    print("THANK YOU!!!")
+
